@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/services/hive.service.dart';
 import 'package:flutter_app/views/chat_window/chat_window.dart';
 import 'package:flutter_app/views/utils/extensions.dart';
 
@@ -13,9 +14,28 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  final List<Widget> _pages = [ChatWindow(), ChatWindow()];
+  final List<Widget> _pages = [
+    ChatWindow(),
+  ];
+
+  final HiveService _hiveService = HiveService();
+
+  List<String> chatIds = [];
+
+  _HomeState() {
+    chatIds = _hiveService
+        .getAllChats()
+        .map((item) => item.key.toString())
+        .toList();
+  }
 
   int _selected = 0;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

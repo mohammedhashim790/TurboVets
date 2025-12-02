@@ -1,15 +1,15 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_app/models/chat.model.dart';
-import 'package:flutter_app/models/message.model.dart';
 import 'package:flutter_app/services/hive.service.dart';
 import 'package:flutter_app/views/utils/text_field.dart';
-import 'package:uuid/uuid.dart';
 
-import '../utils/bubble/bubble.dart' show SenderBubble, ReceiverBubble;
+import '../../models/chat.model.dart';
+import '../../models/message.model.dart';
+import '../utils/bubble/bubble.dart';
 
 class ChatWindow extends StatefulWidget {
-  String? id;
-  ChatWindow({super.key, this.id});
+  ChatWindow({super.key});
 
   @override
   State<ChatWindow> createState() => _ChatWindowState();
@@ -22,9 +22,11 @@ class _ChatWindowState extends State<ChatWindow> {
 
   final HiveService _hiveService = HiveService();
 
-  final List<Widget> _messages = [];
+  List<Widget> _messages = [];
 
   bool _activeScrollList = false;
+
+  String chatId = "";
 
   void _chatScrollListener() {
     final double max = _scrollController.position.maxScrollExtent;
@@ -48,13 +50,30 @@ class _ChatWindowState extends State<ChatWindow> {
   void initState() {
     super.initState();
     _scrollController.addListener(_chatScrollListener);
+
+    _readChat();
+  }
+
+  void _readChat() {
+    chatId = _hiveService.getChatId();
+    _messages = _hiveService.getChat()!.messages.map((message) {
+      if (message.isSender) {
+        return SenderBubble(message: message.text, time: message.timestamp);
+      }
+      return ReceiverBubble(message: message.text, time: message.timestamp);
+    }).toList();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       // extendBodyBehindAppBar: true,
-      appBar: AppBar(),
+      appBar: AppBar(), // floatingActionButton: FloatingActionButton(
+      //   onPressed: () {
+      //     List<ChatModel> cha = _hiveService.getAllChats();
+      //     print("object");
+      //   },
+      // ),
       body: Stack(
         children: [
           Column(
@@ -97,25 +116,35 @@ class _ChatWindowState extends State<ChatWindow> {
   }
 
   void handleSend(String text, bool isSender) {
-    setState(() {
-      if (widget.id == null) {
-        widget.id = Uuid().v4();
-        _hiveService.addChat(
-          ChatModel(chatId: widget.id!, chatName: "New Chat", messages: []),
-        );
-      }
-      _hiveService.addMessage(
-        widget.id!,
-        MessageModel(text: text, isSender: isSender),
-      );
-      if (isSender) {
+    _hiveService.addChat(
+      ChatModel(chatId: chatId, chatName: "New Chat", messages: []),
+    );
+
+    if (isSender) {
+      setState(() {
         _messages.add(SenderBubble(message: text, time: DateTime.now()));
-      } else {
-        _messages.add(ReceiverBubble(message: text, time: DateTime.now()));
-      }
-      if (_messages.length > 18) {
-        _scrollToBottom();
-      }
-    });
+      });
+
+      _hiveService
+          .addMessage(chatId, MessageModel(text: text, isSender: isSender))
+          .then((response) {
+            // a delay of 2 seconds to read
+            Timer(Duration(seconds: 2), () {
+              _hiveService.addReply(
+                chatId,
+                MessageModel(text: response, isSender: false),
+              );
+              setState(() {
+                _messages.add(
+                  ReceiverBubble(message: response, time: DateTime.now()),
+                );
+                if (_messages.length > 18) {
+                  _scrollToBottom();
+                }
+              });
+              _scrollToBottom();
+            });
+          });
+    }
   }
 }
