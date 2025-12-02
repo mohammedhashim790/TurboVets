@@ -20,7 +20,7 @@
     <div class="flex flex-col gap-2">
       <label class="text-sm font-medium text-slate-700">Editor</label>
       <textarea
-        [(ngModel)]="content"
+        [(ngModel)]="textControl"
         rows="16"
         class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm md:text-base text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900 resize-y"
       ></textarea>
@@ -30,7 +30,7 @@
       <label class="text-sm font-medium text-slate-700">Preview</label>
       <div
         class="w-full rounded-lg border border-slate-200 bg-white px-3 py-3 text-sm md:text-base text-slate-900 overflow-auto min-h-[4rem]"
-        [innerHTML]="previewHtml"
+        [innerHTML]="preview"
       ></div>
     </div>
   </div>

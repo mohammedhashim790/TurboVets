@@ -1,17 +1,34 @@
-import {Component} from '@angular/core';
-import {NgClass, NgForOf} from '@angular/common';
+import {Component, OnInit} from '@angular/core';
+import {NgClass} from '@angular/common';
+import {Ticket, TicketStatus} from '../../models/ticket.model';
+import {TicketService} from '../../service/ticket/ticket-service';
 
 @Component({
-  selector: 'app-ticket-viewer',
-  imports: [NgClass, NgForOf],
-  templateUrl: './ticket-viewer.html',
-  styleUrl: './ticket-viewer.css',
+  selector: 'ticket-viewer', imports: [NgClass], templateUrl: './ticket-viewer.html', styleUrl: './ticket-viewer.css',
 })
-export class TicketViewer {
-  protected activeFilter: string = "";
-  protected filteredTickets: any[] = [];
+export class TicketViewer implements OnInit {
+  protected activeFilter: "ALL" | TicketStatus = "ALL";
 
-  protected setFilter(all: string) {
+  public filteredTickets: Ticket[] = [];
 
+  constructor(protected ticketService: TicketService) {
+    this.setFilter("ALL");
   }
+
+
+  ngOnInit(): void {
+  }
+
+
+  protected async setFilter(status: "ALL" | TicketStatus): Promise<void> {
+    this.activeFilter = status;
+
+    if (status === "ALL") {
+      this.filteredTickets = await this.ticketService.list();
+    } else {
+      this.filteredTickets = await this.ticketService.getByStatus(status);
+    }
+  }
+
+  protected readonly TicketStatus = TicketStatus;
 }

@@ -8,29 +8,29 @@
     <div class="inline-flex rounded-lg shadow-sm border border-slate-200 overflow-hidden bg-slate-50">
       <button
         class="px-3 md:px-4 py-1.5 text-xs md:text-sm font-medium"
-        [ngClass]="activeFilter === 'All' ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-200'"
-        (click)="setFilter('All')"
+        [ngClass]="activeFilter === 'ALL' ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-200'"
+        (click)="setFilter('ALL')"
       >
         All
       </button>
       <button
         class="px-3 md:px-4 py-1.5 text-xs md:text-sm font-medium"
-        [ngClass]="activeFilter === 'Open' ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-200'"
-        (click)="setFilter('Open')"
+        [ngClass]="activeFilter === TicketStatus.OPEN ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-200'"
+        (click)="setFilter(TicketStatus.OPEN)"
       >
         Open
       </button>
       <button
         class="px-3 md:px-4 py-1.5 text-xs md:text-sm font-medium"
-        [ngClass]="activeFilter === 'In Progress' ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-200'"
-        (click)="setFilter('In Progress')"
+        [ngClass]="activeFilter === TicketStatus.IN_PROGRESS ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-200'"
+        (click)="setFilter(TicketStatus.IN_PROGRESS)"
       >
         In Progress
       </button>
       <button
         class="px-3 md:px-4 py-1.5 text-xs md:text-sm font-medium"
-        [ngClass]="activeFilter === 'Closed' ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-200'"
-        (click)="setFilter('Closed')"
+        [ngClass]="activeFilter === TicketStatus.CLOSED ? 'bg-slate-900 text-white' : 'text-slate-700 hover:bg-slate-200'"
+        (click)="setFilter(TicketStatus.CLOSED)"
       >
         Closed
       </button>
@@ -56,29 +56,31 @@
       </tr>
       </thead>
       <tbody class="bg-white divide-y divide-slate-100">
-      <tr *ngFor="let ticket of filteredTickets" class="hover:bg-slate-50">
-        <td class="px-3 md:px-4 py-2 text-sm text-slate-900 whitespace-nowrap">
-          #{{ ticket.id }}
-        </td>
-        <td class="px-3 md:px-4 py-2 text-sm text-slate-800">
-          {{ ticket.subject }}
-        </td>
-        <td class="px-3 md:px-4 py-2 text-sm whitespace-nowrap">
+        @for (ticket of filteredTickets; track $index) {
+          <tr class="hover:bg-slate-50">
+            <td class="px-3 md:px-4 py-2 text-sm text-slate-900 whitespace-nowrap">
+              {{ ticket.id }}
+            </td>
+            <td class="px-3 md:px-4 py-2 text-sm text-slate-800">
+              {{ ticket.subject }}
+            </td>
+            <td class="px-3 md:px-4 py-2 text-sm whitespace-nowrap">
             <span
               class="inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium"
               [ngClass]="{
-                'bg-emerald-50 text-emerald-700': ticket.status === 'Open',
-                'bg-amber-50 text-amber-700': ticket.status === 'In Progress',
-                'bg-slate-100 text-slate-700': ticket.status === 'Closed'
+                'bg-emerald-50 text-emerald-700': ticket.status === TicketStatus.OPEN,
+                'bg-amber-50 text-amber-700': ticket.status === TicketStatus.IN_PROGRESS,
+                'bg-slate-100 text-slate-700': ticket.status === TicketStatus.CLOSED
               }"
             >
-              {{ ticket.status }}
+              {{ TicketStatus[ticket.status] }}
             </span>
-        </td>
-        <td class="px-3 md:px-4 py-2 text-sm text-slate-600 whitespace-nowrap">
-          {{ ticket.createdAt }}
-        </td>
-      </tr>
+            </td>
+            <td class="px-3 md:px-4 py-2 text-sm text-slate-600 whitespace-nowrap">
+              {{ ticket.createdAt }}
+            </td>
+          </tr>
+        }
       </tbody>
     </table>
   </div>
