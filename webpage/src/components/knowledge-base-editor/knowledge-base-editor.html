@@ -1,0 +1,37 @@
+<div class="flex flex-col gap-4">
+  <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+    <div>
+      <h1 class="text-xl md:text-2xl font-semibold text-slate-900">Knowledgebase Editor</h1>
+      <p class="text-sm text-slate-500">
+        Write markdown and preview it before saving. Content is stored locally in your browser.
+      </p>
+    </div>
+
+    <button
+      type="button"
+      (click)="save()"
+      class="inline-flex items-center justify-center rounded-lg bg-slate-900 text-white text-sm md:text-base font-medium px-4 py-2 shadow-sm hover:bg-slate-800 active:bg-slate-900 transition"
+    >
+      Save Draft
+    </button>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div class="flex flex-col gap-2">
+      <label class="text-sm font-medium text-slate-700">Editor</label>
+      <textarea
+        [(ngModel)]="content"
+        rows="16"
+        class="w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-sm md:text-base text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900 focus:border-slate-900 resize-y"
+      ></textarea>
+    </div>
+
+    <div class="flex flex-col gap-2">
+      <label class="text-sm font-medium text-slate-700">Preview</label>
+      <div
+        class="w-full rounded-lg border border-slate-200 bg-white px-3 py-3 text-sm md:text-base text-slate-900 overflow-auto min-h-[4rem]"
+        [innerHTML]="previewHtml"
+      ></div>
+    </div>
+  </div>
+</div>
