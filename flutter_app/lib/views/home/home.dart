@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_app/services/hive.service.dart';
 import 'package:flutter_app/views/chat_window/chat_window.dart';
-import 'package:flutter_app/views/utils/extensions.dart';
 
-import '../utils/drawer/drawer_action_button.dart';
-import '../utils/drawer/drawer_title.dart';
+import '../dashboard/dashboard.dart';
 
 class Home extends StatefulWidget {
   const Home({super.key});
@@ -14,68 +11,71 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  final List<Widget> _pages = [
-    ChatWindow(),
-  ];
-
-  final HiveService _hiveService = HiveService();
-
-  List<String> chatIds = [];
-
-  _HomeState() {
-    chatIds = _hiveService
-        .getAllChats()
-        .map((item) => item.key.toString())
-        .toList();
-  }
+  final List<Widget> _pages = [ChatWindow(), Dashboard()];
+  final List<String> _pagesTitle = ["Chat", "Dashboard"];
 
   int _selected = 0;
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(),
-      drawer: Drawer(
-        child: Padding(
-          padding: EdgeInsets.all(10.0),
-          child: ListView(
-            padding: EdgeInsets.only(top: 50.0),
-            children: [
-              DrawerActionButton(
-                icon: Icon(Icons.dashboard),
-                text: "Dashboard",
-                onTap: () {
-                  setState(() {
-                    _selected = 1;
-                  });
-                  context.pop();
-                },
-              ),
-              DrawerActionButton(
-                icon: Icon(Icons.add),
-                text: "New Chat",
-                onTap: () {
-                  setState(() {
-                    _selected = 0;
-                  });
-                  context.pop();
-                },
-              ),
-              DrawerTitle(title: "Chat List"),
-              //   Load chat session here and render
-            ],
+      extendBody: true,
+      extendBodyBehindAppBar: true,
+      backgroundColor: Colors.transparent,
+      appBar: AppBar(
+        title: Container(
+          height: 50,
+          margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+          decoration: BoxDecoration(
+            color: const Color(0xFF2D2D3A),
+            borderRadius: BorderRadius.circular(25), // Rounded container
+          ),
+          child: Row(
+            children: List.generate(_pagesTitle.length, (index) {
+              // Determine if this specific tab is active
+              bool isActive = index == _selected;
+
+              return Expanded(
+                child: GestureDetector(
+                  // 2. The Logic: Update state on tap
+                  onTap: () {
+                    setState(() {
+                      _selected = index;
+                    });
+                  },
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    margin: const EdgeInsets.all(4),
+                    decoration: BoxDecoration(
+                      color: isActive ? Colors.blueAccent : Colors.transparent,
+                      borderRadius: BorderRadius.circular(25),
+                    ),
+                    alignment: Alignment.center,
+                    child: Text(
+                      _pagesTitle[index],
+                      style: TextStyle(
+                        color: isActive ? Colors.white : Colors.grey,
+                        fontWeight: isActive
+                            ? FontWeight.bold
+                            : FontWeight.normal,
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            }),
           ),
         ),
       ),
       body: SafeArea(
         // Best to use Page transition builder or pageview for widget optimisation
-        child: _pages.elementAt(_selected),
+        // Indexed stack works best to void rerender.
+        child: IndexedStack(index: _selected, children: _pages),
       ),
     );
   }

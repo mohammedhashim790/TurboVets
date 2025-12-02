@@ -1,19 +1,25 @@
+import 'dart:async';
 import 'dart:math';
 
-import 'package:flutter_app/models/chat.model.dart';
 import 'package:flutter_app/models/message.model.dart';
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:uuid/uuid.dart';
 
-class HiveService {
+
+
+
+class MessageService {
   static const String _chatsBox = 'chats';
   static const String _messagesBox = 'messages';
 
-  static final HiveService _instance = HiveService._();
+  static final MessageService _instance = MessageService._();
 
-  factory HiveService() => _instance;
+  factory MessageService() => _instance;
 
   final Random random = Random();
+
+  Box<MessageModel> get messages {
+    return Hive.box<MessageModel>(_messagesBox);
+  }
 
   static final List<String> _sampleMessages = [
     "Background apps, location services, notifications, weak signal, or an aging battery often cause unexpected phone battery drain.",
@@ -28,65 +34,31 @@ class HiveService {
     "Writing prompt: You find a diary that lets you talk to versions of yourself from different times—one of them needs help to prevent a mistake that could erase your future.",
   ];
 
-  HiveService._();
+  MessageService._();
 
-  Future<void> addChat(ChatModel chat) async {
-    final chats = Hive.box<ChatModel>(_chatsBox);
-    await chats.put(chat.chatId, chat);
+  Future<void> addMessage(MessageModel message) async {
+    messages.add(message);
+    return Future.delayed(Duration(seconds: 1), () {
+      messages.add(
+        MessageModel(
+          text: _sampleMessages[random.nextInt(_sampleMessages.length)],
+          isSender: false,
+        ),
+      );
+      return;
+    });
   }
 
-  Future<String> addMessage(String chatId, MessageModel message) async {
-    final chats = Hive.box<ChatModel>(_chatsBox);
-    final chat = chats.get(chatId);
-    if (chat != null) {
-      chat.messages.add(message);
-      await chat.save();
-    }
-    return Future.value(
-      _sampleMessages[random.nextInt(_sampleMessages.length)],
-    );
+  Future<void> addReply( MessageModel message) async {
+    messages.add(message);
   }
 
-  Future<void> addReply(String chatId, MessageModel message) async {
-    final chats = Hive.box<ChatModel>(_chatsBox);
-    final chat = chats.get(chatId);
-    if (chat != null) {
-      chat.messages.add(message);
-      await chat.save();
-    }
-  }
-
-  List<ChatModel> getAllChats() {
-    final chats = Hive.box<ChatModel>(_chatsBox);
-    return chats.values.toList();
-  }
-
-  ChatModel? getChatById(String chatId) {
-    final chats = Hive.box<ChatModel>(_chatsBox);
-    return chats.get(chatId);
+  List<MessageModel> getAllChats() {
+    return messages.values.toList()
+      ..sort((a, b) => a.createdAt.compareTo(b.createdAt));
   }
 
   Future<void> clearAllData() async {
-    final chatsBox = Hive.box<ChatModel>(_chatsBox);
-    final messagesBox = Hive.box<MessageModel>(_messagesBox);
-    await chatsBox.clear();
-    await messagesBox.clear();
-  }
-
-  ChatModel? getChat() {
-    final chats = getAllChats();
-    if (chats.isEmpty) {
-      return null;
-    }
-
-    return getChatById(chats.first.chatId);
-  }
-
-  String getChatId() {
-    final chats = getAllChats();
-    if (chats.isEmpty) {
-      return Uuid().v4();
-    }
-    return chats.first.chatId;
+    await messages.clear();
   }
 }

@@ -3,16 +3,12 @@ import 'package:flutter_app/theme.dart';
 import 'package:flutter_app/views/splash/splash.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-import 'models/chat.model.dart';
 import 'models/message.model.dart';
 
 Future<void> main() async {
   await Hive.initFlutter();
 
   Hive.registerAdapter(MessageModelAdapter());
-  Hive.registerAdapter(ChatModelAdapter());
-
-  await Hive.openBox<ChatModel>('chats');
   await Hive.openBox<MessageModel>('messages');
   runApp(const TurboApp());
 }

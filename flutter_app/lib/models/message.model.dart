@@ -12,12 +12,12 @@ class MessageModel extends HiveObject {
   final String text;
 
   @HiveField(2)
-  final DateTime timestamp;
+  final DateTime createdAt;
 
   @HiveField(3)
   final bool isSender;
 
   MessageModel({required this.text, required this.isSender})
     : messageId = Uuid().v4(),
-      timestamp = DateTime.now();
+      createdAt = DateTime.now();
 }

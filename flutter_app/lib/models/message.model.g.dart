@@ -31,7 +31,7 @@ class MessageModelAdapter extends TypeAdapter<MessageModel> {
       ..writeByte(1)
       ..write(obj.text)
       ..writeByte(2)
-      ..write(obj.timestamp)
+      ..write(obj.createdAt)
       ..writeByte(3)
       ..write(obj.isSender);
   }
