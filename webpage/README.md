@@ -65,3 +65,8 @@ For more information on using the Angular CLI, including detailed command refere
 ```bash
     npm install tailwindcss @tailwindcss/postcss postcss
 ```
+
+
+
+## Design Reference
+https://www.behance.net/gallery/233794683/Eventily-Event-booking-and-management-app?tracking_source=search_projects|event+dashboard+ui+figma&l=4
